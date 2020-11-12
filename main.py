@@ -38,8 +38,7 @@ net = cv2.dnn.readNetFromCaffe("./mobilenet_ssd/MobileNetSSD_deploy.prototxt",
 # if a video path was not supplied, grab a reference to the webcam
 if not args.get("input", False):
     print("[INFO] starting video stream...")
-    # cv2.VideoCapture(0, cv2.CAP_V4L2)
-    vs = cv2.VideoCapture(0)
+    vs = VideoStream(src=0).start()
     time.sleep(2.0)
 
 # otherwise, grab a reference to the video file
@@ -89,13 +88,7 @@ while True:
     # resize the frame to have a maximum width of 500 pixels (the
     # less data we have, the faster we can process it), then convert
     # the frame from BGR to RGB for dlib
-    # frame = imutils.resize(frame, width=500)
-
-    ret, frame = vs.read()
-    frame = cv2.flip(frame,1)
-
-    print(frame)
-
+    frame = imutils.resize(frame, width=500)
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
     # if the frame dimensions are empty, set them
@@ -251,8 +244,6 @@ while True:
         ("Down", totalDown),        
         ("Status", status),
     ]
-
-    print(info)
 
     # loop over the info tuples and draw them on our frame
     for (i, (k, v)) in enumerate(info):

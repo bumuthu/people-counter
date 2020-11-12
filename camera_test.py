@@ -1,6 +1,6 @@
 import cv2
 pipeline = "rtspsrc location=\"rtsp://login:password@host:port/\" ! rtph264depay ! h264parse ! omxh264dec ! nvvidconv ! video/x-raw, format=(string)BGRx! videoconvert ! appsink"
-capture = cv2.VideoCapture(0, cv2.CAP_V4L)
+capture = cv2.VideoCapture(0)
 count = 0 
 while capture.isOpened():
     print("hello", count)

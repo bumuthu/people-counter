@@ -39,7 +39,7 @@ net = cv2.dnn.readNetFromCaffe("./mobilenet_ssd/MobileNetSSD_deploy.prototxt",
 if not args.get("input", False):
     print("[INFO] starting video stream...")
     # cv2.VideoCapture(0, cv2.CAP_V4L2)
-    vs = cv2.VideoCapture(0)
+    vs = cv2.VideoCapture(0, cv2.CAP_V4L2)
     time.sleep(2.0)
 
 # otherwise, grab a reference to the video file

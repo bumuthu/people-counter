@@ -250,6 +250,8 @@ while True:
         ("Status", status),
     ]
 
+    print(info)
+
     # loop over the info tuples and draw them on our frame
     for (i, (k, v)) in enumerate(info):
         text = "{}: {}".format(k, v)

@@ -39,7 +39,7 @@ net = cv2.dnn.readNetFromCaffe("./mobilenet_ssd/MobileNetSSD_deploy.prototxt",
 if not args.get("input", False):
     print("[INFO] starting video stream...")
     # cv2.VideoCapture(0, cv2.CAP_V4L2)
-    vs = cv2.VideoCapture(0, cv2.CAP_V4L2)
+    vs = cv2.VideoCapture(0)
     time.sleep(2.0)
 
 # otherwise, grab a reference to the video file
@@ -93,6 +93,8 @@ while True:
 
     ret, frame = vs.read()
     frame = cv2.flip(frame,1)
+
+    print(frame)
 
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 

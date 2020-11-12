@@ -38,7 +38,7 @@ net = cv2.dnn.readNetFromCaffe("./mobilenet_ssd/MobileNetSSD_deploy.prototxt",
 # if a video path was not supplied, grab a reference to the webcam
 if not args.get("input", False):
     print("[INFO] starting video stream...")
-    vs = VideoStream(src=0).start()
+    vs = cv2.VideoCapture('/dev/video1')
     time.sleep(2.0)
 
 # otherwise, grab a reference to the video file

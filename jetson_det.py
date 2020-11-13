@@ -9,5 +9,5 @@ while True:
 	img = camera.Capture()
 	detections = net.Detect(img)
     print(detections)
-	display.Render(img)
+    display.Render(img)
 	display.SetStatus("Object Detection | Network {:.0f} FPS".format(net.GetNetworkFPS()))

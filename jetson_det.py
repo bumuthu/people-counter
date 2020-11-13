@@ -8,8 +8,9 @@ display = jetson.utils.videoOutput("display://0") # 'my_video.mp4' for file
 while True:
 	img = camera.Capture()
 	detections = net.Detect(img)
+    
+    for detection in detections:
+		print(detection)
 
-    print(detections)
-
-    # display.Render(img)
-	# display.SetStatus("Object Detection | Network {:.0f} FPS".format(net.GetNetworkFPS()))
+    display.Render(img)
+	display.SetStatus("Object Detection | Network {:.0f} FPS".format(net.GetNetworkFPS()))

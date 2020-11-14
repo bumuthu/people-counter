@@ -38,7 +38,7 @@ net = cv2.dnn.readNetFromCaffe("./mobilenet_ssd/MobileNetSSD_deploy.prototxt",
 # if a video path was not supplied, grab a reference to the webcam
 if not args.get("input", False):
     print("[INFO] starting video stream...")
-    gst = "nvarguscamerasrc sensor_mode=0 ! video/x-raw(memory:NVMM), width=(int)3820, height=(int)2464, format=(string)NV12, framerate=(fraction)21/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw,width=(int)960,height=(int)616,format=(string)BGR ! appsink"
+    gst = "rtspsrc location=rtsp://127.0.0.1/test latency=0 ! rtph265depay ! h265parse ! omxh265dec ! videoconvert ! appsink"
     vs = cv2.VideoCapture(gst)
     time.sleep(2.0)
 

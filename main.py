@@ -34,20 +34,20 @@ CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
            "sofa", "train", "tvmonitor"]
 
 # load our serialized model from disk
-print("[INFO] loading model...")
+print("[INFO] loading model..")
 net = cv2.dnn.readNetFromCaffe("./mobilenet_ssd/MobileNetSSD_deploy.prototxt",
                                "./mobilenet_ssd/MobileNetSSD_deploy.caffemodel")
 
 # if a video path was not supplied, grab a reference to the webcam
 if not args.get("input", False):
-    print("[INFO] starting video stream...")
+    print("[INFO] started video stream.")
     gst = "nvarguscamerasrc sensor_mode=0 ! video/x-raw(memory:NVMM), width=(int)3820, height=(int)2464, format=(string)NV12, framerate=(fraction)21/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw,width=(int)960,height=(int)616,format=(string)BGR ! appsink"
     vs = cv2.VideoCapture(gst)
     time.sleep(2.0)
 
 # otherwise, grab a reference to the video file
 else:
-    print("[INFO] opening video file...")
+    print("[INFO] opened video file.")
     vs = cv2.VideoCapture(args["input"])
 
 # initialize the video writer (we'll instantiate later if need be)
@@ -71,9 +71,6 @@ totalFrames = 0
 totalDown = 0
 totalUp = 0
 
-# net amount of people towards inside of the room
-netAmount = 0
-
 # start the frames per second throughput estimator
 fps = FPS().start()
 
@@ -84,7 +81,7 @@ dataWritingTime = 5
 t0 = time.time()
 
 # columns of CSV
-csv_columns = ["date","time","up count", "down count", "net amount"]
+csv_columns = ["date", "time", "up count", "down count", "net amount"]
 
 if not os.path.exists("./couting_logs.csv"):
     with open("couting_logs.csv", "a", newline='') as f:
@@ -109,7 +106,7 @@ while True:
     # frame = imutils.resize(frame, width=500)
 
     ret, frame = vs.read()
-    frame = cv2.flip(frame,1)
+    frame = cv2.flip(frame, 1)
 
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -235,7 +232,8 @@ while True:
                 # line, count the object
                 if direction < 0 and centroid[1] < H // 2:
                     totalUp += 1
-                    netAmount += 1
+                    print(
+                        "[INFO] person towards upside detected. total up count: ", totalUp)
                     to.counted = True
 
                 # if the direction is positive (indicating the object
@@ -243,8 +241,8 @@ while True:
                 # center line, count the object
                 elif direction > 0 and centroid[1] > H // 2:
                     totalDown += 1
-                    if totalDown - totalUp >= 0:
-                        netAmount = 0
+                    print(
+                        "[INFO] person towards downside detected. total down count: ", totalDown)
                     to.counted = True
 
         # store the trackable object in our dictionary
@@ -254,16 +252,30 @@ while True:
         # object on the output frame
         text = "person {}".format(objectID)
         cv2.putText(frame, text, (centroid[0] - 10, centroid[1] - 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-        cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+        #cv2.circle(frame, (centroid[0], centroid[1]), 4, (0, 255, 0), -1)
 
+    for rec in rects:
+        cX = int((rec[0] + rec[2]) / 2.0)
+        cY = int((rec[1] + rec[3]) / 2.0)
+
+        centroids_list = []
+        for (objectID, centroid) in objects.items():
+            centroids_list.append(list(centroid))
+
+        if (cX, cY) in centroids_list:
+            cv2.rectangle(imgcv, (rec[0], rec[1]),
+                          (rec[2], rec[3]), (0, 255, 0), 5)
 
     # construct a tuple of information we will be displaying on the
     # frame
+
+    netAmount = totalUp - totalDown
+
     info = [
-        ("Net Amount", netAmount),
-        ("Up", totalUp),
-        ("Down", totalDown),        
+        ("Net Up Count", netAmount),
+        ("Total Up Count", totalUp),
+        ("Total Down Count", totalDown),
         ("Status", status),
     ]
 
@@ -290,7 +302,7 @@ while True:
     for (i, (k, v)) in enumerate(info):
         text = "{}: {}".format(k, v)
         cv2.putText(frame, text, (10, H - ((i * 20) + 20)),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
 
     # check to see if we should write the frame to disk
     if writer is not None:
@@ -328,5 +340,3 @@ else:
 
 # close any open windows
 cv2.destroyAllWindows()
-
-

@@ -5,6 +5,9 @@ from imutils.video import VideoStream
 from imutils.video import FPS
 import numpy as np
 import argparse
+import csv
+import os
+import datetime
 import imutils
 import time
 import dlib
@@ -73,6 +76,20 @@ netAmount = 0
 
 # start the frames per second throughput estimator
 fps = FPS().start()
+
+# data writing time gap in seconds
+dataWritingTime = 5
+
+# timer started
+t0 = time.time()
+
+# columns of CSV
+csv_columns = ["date","time","up count", "down count", "net amount"]
+
+if not os.path.exists("./couting_logs.csv"):
+    with open("couting_logs.csv", "a", newline='') as f:
+        csv_writer = csv.writer(f)
+        csv_writer.writerow(csv_columns)
 
 # loop over frames from the video stream
 while True:
@@ -249,6 +266,25 @@ while True:
         ("Down", totalDown),        
         ("Status", status),
     ]
+
+    now_datetime = datetime.datetime.now()
+
+    logDic = {
+        "date": now_datetime.strftime("%X"),
+        "time": now_datetime.strftime("%x"),
+        "up count": totalUp,
+        "down count": totalDown,
+        "net amount": netAmount
+    }
+
+    # save data if the time passed
+    t1 = time.time()
+
+    if (t1 - t0) >= dataWritingTime:
+        with open("couting_logs.csv", "a", newline='') as f:
+            csv_writer = csv.DictWriter(f, fieldnames=csv_columns)
+            csv_writer.writerow(logDic)
+        t0 = time.time()
 
     # loop over the info tuples and draw them on our frame
     for (i, (k, v)) in enumerate(info):
